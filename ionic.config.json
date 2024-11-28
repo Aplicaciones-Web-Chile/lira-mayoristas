@@ -1,0 +1,7 @@
+{
+  "name": "lira-mayoristas",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
