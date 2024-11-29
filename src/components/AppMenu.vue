@@ -39,6 +39,21 @@
       </ion-menu-toggle>
     </ion-list>
 
+    <ion-list lines="none">
+      <ion-item router-link="/products" lines="none">
+        <ion-icon :icon="gridOutline" slot="start"></ion-icon>
+        <ion-label>Productos</ion-label>
+      </ion-item>
+      <ion-item router-link="/orders" lines="none">
+        <ion-icon :icon="receiptOutline" slot="start"></ion-icon>
+        <ion-label>Pedidos</ion-label>
+      </ion-item>
+      <ion-item router-link="/cart" lines="none">
+        <ion-icon :icon="cartOutline" slot="start"></ion-icon>
+        <ion-label>Carrito</ion-label>
+      </ion-item>
+    </ion-list>
+
     <ion-list lines="none" class="bottom-list">
       <ion-menu-toggle auto-hide="false">
         <ion-item button @click="handleLogout" class="logout-item">
@@ -76,6 +91,8 @@ import {
   personOutline,
   logOutOutline,
   closeOutline,
+  gridOutline,
+  receiptOutline,
 } from 'ionicons/icons';
 import { authService } from '@/services/auth.service';
 import type { User } from '@/services/auth.service';
@@ -160,7 +177,6 @@ ion-list {
 
 ion-item {
   --padding-start: 16px;
-  --padding-end: 16px;
   --min-height: 48px;
   margin: 4px 8px;
   border-radius: 8px;
@@ -175,6 +191,20 @@ ion-item.selected {
 ion-icon {
   font-size: 20px;
   color: var(--ion-color-medium);
+}
+
+ion-item {
+  --padding-start: 1rem;
+  --min-height: 50px;
+  cursor: pointer;
+}
+
+ion-icon {
+  color: var(--ion-color-medium);
+}
+
+ion-item:hover {
+  --background: var(--ion-color-light);
 }
 
 .bottom-list {

@@ -1,10 +1,9 @@
 <template>
-  <ion-button @click="goToCart">
-    <ion-icon :icon="cartOutline" slot="start"></ion-icon>
+  <ion-button fill="clear" @click="goToCart">
+    <ion-icon :icon="cartOutline" slot="icon-only"></ion-icon>
     <ion-badge color="danger" v-if="cartSummary.totalItems > 0">
       {{ cartSummary.totalItems }}
     </ion-badge>
-    {{ formatPrice(cartSummary.total) }}
   </ion-button>
 </template>
 
@@ -37,21 +36,14 @@ export default defineComponent({
       cartSummary.value = cartService.getCartSummary();
     };
 
-    // Formatear precio
-    const formatPrice = (price: number): string => {
-      return `$${price.toLocaleString()}`;
-    };
-
     // Ir al carrito
     const goToCart = () => {
       router.push('/cart');
     };
 
-    // Observar cambios en el localStorage
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'cart') {
-        updateCartSummary();
-      }
+    // Observar cambios en el carrito
+    const handleCartChange = () => {
+      updateCartSummary();
     };
 
     onMounted(() => {
@@ -59,18 +51,17 @@ export default defineComponent({
       cartService.loadCart();
       updateCartSummary();
 
-      // Escuchar cambios en el localStorage
-      window.addEventListener('storage', handleStorageChange);
+      // Escuchar cambios en el carrito
+      window.addEventListener('cartChange', handleCartChange);
     });
 
     onUnmounted(() => {
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('cartChange', handleCartChange);
     });
 
     return {
       cartSummary,
       cartOutline,
-      formatPrice,
       goToCart,
     };
   },
@@ -80,12 +71,22 @@ export default defineComponent({
 <style scoped>
 ion-badge {
   position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate(50%, -50%);
+  top: 5px;
+  right: 5px;
+  font-size: 12px;
+  padding: 2px 4px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
 }
 
 ion-button {
   position: relative;
+  --padding-start: 8px;
+  --padding-end: 8px;
+}
+
+ion-icon {
+  font-size: 24px;
 }
 </style>

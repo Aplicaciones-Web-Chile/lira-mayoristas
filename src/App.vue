@@ -1,9 +1,7 @@
 <template>
   <ion-app>
-    <ion-menu side="start" content-id="main-content" type="overlay">
-      <ion-content>
-        <AppMenu />
-      </ion-content>
+    <ion-menu content-id="main-content">
+      <app-menu></app-menu>
     </ion-menu>
     
     <div class="ion-page" id="main-content">
@@ -23,22 +21,70 @@
   </ion-app>
 </template>
 
-<script setup lang="ts">
-import { IonApp, IonContent, IonMenu, IonRouterOutlet, IonHeader, IonToolbar, IonTitle, IonButtons } from '@ionic/vue';
-import AppMenu from '@/components/AppMenu.vue';
-import CartButton from '@/components/CartButton.vue';
-
-components: {
-  IonApp,
+<script lang="ts">
+import { defineComponent, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import { 
+  IonApp, 
+  IonContent, 
+  IonMenu, 
   IonRouterOutlet,
-  IonMenu,
   IonHeader,
   IonToolbar,
   IonTitle,
-  IonContent,
   IonButtons,
-  CartButton
-},
+  IonMenuButton
+} from '@ionic/vue';
+import AppMenu from '@/components/AppMenu.vue';
+import CartButton from '@/components/CartButton.vue';
+
+export default defineComponent({
+  name: 'App',
+  components: {
+    IonApp,
+    IonRouterOutlet,
+    IonMenu,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonButtons,
+    IonMenuButton,
+    AppMenu,
+    CartButton
+  },
+  setup() {
+    const route = useRoute();
+    const pageTitle = ref('');
+
+    watch(
+      () => route.name,
+      (newRouteName) => {
+        switch (newRouteName) {
+          case 'products':
+            pageTitle.value = 'Productos';
+            break;
+          case 'product-detail':
+            pageTitle.value = 'Detalle del Producto';
+            break;
+          case 'cart':
+            pageTitle.value = 'Carrito';
+            break;
+          case 'orders':
+            pageTitle.value = 'Pedidos';
+            break;
+          default:
+            pageTitle.value = 'Lira Mayoristas';
+        }
+      },
+      { immediate: true }
+    );
+
+    return {
+      pageTitle
+    };
+  }
+});
 </script>
 
 <style>
@@ -77,5 +123,9 @@ ion-item {
   to {
     opacity: 1;
   }
+}
+
+ion-menu ion-content {
+  --background: var(--ion-item-background, var(--ion-background-color, #fff));
 }
 </style>

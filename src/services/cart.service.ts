@@ -10,6 +10,9 @@ const cart = ref<Cart>({
   discount: 0
 });
 
+// Evento personalizado para cambios en el carrito
+const cartChangeEvent = new Event('cartChange');
+
 // Calcular totales del carrito
 const calculateTotals = () => {
   const subtotal = cart.value.items.reduce((total, item) => {
@@ -23,6 +26,11 @@ const calculateTotals = () => {
   cart.value.subtotal = subtotal;
   cart.value.total = totalWithDiscount;
   cart.value.discount = subtotal - totalWithDiscount;
+};
+
+// Notificar cambios en el carrito
+const notifyCartChange = () => {
+  window.dispatchEvent(cartChangeEvent);
 };
 
 // Servicio del carrito
@@ -48,10 +56,8 @@ export const cartService = {
     const existingItem = cart.value.items.find(item => item.product.id === product.id);
 
     if (existingItem) {
-      // Actualizar cantidad si el producto ya existe
       existingItem.quantity += quantity;
     } else {
-      // Añadir nuevo item si el producto no existe
       cart.value.items.push({
         product,
         quantity
@@ -60,6 +66,7 @@ export const cartService = {
 
     calculateTotals();
     this.saveCart();
+    notifyCartChange();
   },
 
   // Actualizar cantidad de un item
@@ -69,6 +76,7 @@ export const cartService = {
       item.quantity = quantity;
       calculateTotals();
       this.saveCart();
+      notifyCartChange();
     }
   },
 
@@ -77,6 +85,7 @@ export const cartService = {
     cart.value.items = cart.value.items.filter(item => item.product.id !== productId);
     calculateTotals();
     this.saveCart();
+    notifyCartChange();
   },
 
   // Limpiar carrito
@@ -84,6 +93,7 @@ export const cartService = {
     cart.value.items = [];
     calculateTotals();
     this.saveCart();
+    notifyCartChange();
   },
 
   // Guardar carrito en localStorage
@@ -99,6 +109,7 @@ export const cartService = {
         const parsedCart = JSON.parse(savedCart);
         cart.value = parsedCart;
         calculateTotals();
+        notifyCartChange();
       } catch (error) {
         console.error('Error al cargar el carrito:', error);
         this.clearCart();
