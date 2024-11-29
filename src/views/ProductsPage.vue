@@ -139,10 +139,10 @@
             :key="product.id"
           >
             <ion-card>
-              <div class="product-image" @click="goToProduct(product.id)">
+              <div class="product-image" @click.prevent="goToProduct(product.id)">
                 <img :src="product.images[0]?.src" :alt="product.images[0]?.alt" />
               </div>
-              <ion-card-header @click="goToProduct(product.id)">
+              <ion-card-header @click.prevent="goToProduct(product.id)">
                 <ion-card-subtitle>{{ product.categories[0]?.name }}</ion-card-subtitle>
                 <ion-card-title>{{ product.name }}</ion-card-title>
               </ion-card-header>
@@ -165,7 +165,7 @@
                   <ion-button 
                     fill="outline" 
                     expand="block"
-                    @click="goToProduct(product.id)"
+                    @click.prevent="goToProduct(product.id)"
                   >
                     <ion-icon :icon="eyeOutline" slot="start"></ion-icon>
                     Ver Detalle
@@ -173,7 +173,7 @@
                   <ion-button 
                     expand="block"
                     :disabled="product.stock_status !== 'instock'"
-                    @click.stop="addToCart(product)"
+                    @click.prevent="addToCart(product)"
                   >
                     <ion-icon :icon="cartOutline" slot="start"></ion-icon>
                     Agregar al Carrito
@@ -368,6 +368,14 @@ export default defineComponent({
 
     const addToCart = (product: ProductWithCustomerPrice) => {
       cartService.addToCart(product);
+      // Mostrar confirmación
+      const toast = document.createElement('ion-toast');
+      toast.message = 'Producto agregado al carrito';
+      toast.duration = 2000;
+      toast.position = 'bottom';
+      toast.color = 'success';
+      document.body.appendChild(toast);
+      toast.present();
     };
 
     const goToProduct = (id: number) => {
