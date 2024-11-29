@@ -5,7 +5,7 @@ import { authService } from '@/services/auth.service';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/home'
+    redirect: '/products'
   },
   {
     path: '/login',
@@ -22,6 +22,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/products',
     name: 'Products',
     component: () => import('@/views/ProductsPage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/products/:id',
+    name: 'ProductDetail',
+    component: () => import('@/views/ProductDetailPage.vue'),
     meta: { requiresAuth: true }
   },
   {

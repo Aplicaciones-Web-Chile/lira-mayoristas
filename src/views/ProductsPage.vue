@@ -138,7 +138,7 @@
             v-for="product in products"
             :key="product.id"
           >
-            <ion-card>
+            <ion-card @click="goToProduct(product.id)">
               <img :src="product.images[0]?.src" :alt="product.images[0]?.alt" />
               <ion-card-header>
                 <ion-card-subtitle>{{ product.categories[0]?.name }}</ion-card-subtitle>
@@ -185,6 +185,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import {
   IonButton,
   IonButtons,
@@ -259,6 +260,7 @@ export default defineComponent({
     IonToolbar,
   },
   setup() {
+    const router = useRouter();
     const products = ref<ProductWithCustomerPrice[]>([]);
     const customerType = ref<CustomerType | null>(null);
     const loading = ref(true);
@@ -351,6 +353,10 @@ export default defineComponent({
       console.log('Agregando al carrito:', product);
     };
 
+    const goToProduct = (id: number) => {
+      router.push(`/products/${id}`);
+    };
+
     onMounted(() => {
       loadProducts();
       loadFilters();
@@ -371,7 +377,8 @@ export default defineComponent({
       loadMore,
       handlePriceChange,
       toggleFilters,
-      addToCart
+      addToCart,
+      goToProduct
     };
   }
 });

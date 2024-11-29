@@ -130,19 +130,14 @@ export interface ProductFilters {
   perPage?: number;
 }
 
-class ProductService {
-  async getProducts(filters: ProductFilters = {}): Promise<{ 
-    products: ProductWithCustomerPrice[],
-    total: number,
-    page: number,
-    totalPages: number
-  }> {
+export const productService = {
+  async getProducts(filters?: ProductFilters): Promise<{ products: ProductWithCustomerPrice[]; page: number; totalPages: number }> {
     await simulateNetworkDelay();
     
     let filteredProducts = [...MOCK_PRODUCTS];
     
     // Aplicar filtros
-    if (filters.search) {
+    if (filters?.search) {
       const searchLower = filters.search.toLowerCase();
       filteredProducts = filteredProducts.filter(p => 
         p.name.toLowerCase().includes(searchLower) ||
@@ -150,36 +145,36 @@ class ProductService {
       );
     }
 
-    if (filters.category && filters.category !== 'all') {
+    if (filters?.category && filters.category !== 'all') {
       filteredProducts = filteredProducts.filter(p => 
         p.categories.some(c => c.slug === filters.category)
       );
     }
 
-    if (filters.brand) {
+    if (filters?.brand) {
       filteredProducts = filteredProducts.filter(p => 
         p.brand.toLowerCase() === filters.brand.toLowerCase()
       );
     }
 
-    if (filters.minPrice !== undefined) {
+    if (filters?.minPrice !== undefined) {
       filteredProducts = filteredProducts.filter(p => p.price >= filters.minPrice!);
     }
 
-    if (filters.maxPrice !== undefined) {
+    if (filters?.maxPrice !== undefined) {
       filteredProducts = filteredProducts.filter(p => p.price <= filters.maxPrice!);
     }
 
-    if (filters.weight) {
+    if (filters?.weight) {
       filteredProducts = filteredProducts.filter(p => p.weight === filters.weight);
     }
 
-    if (filters.inStock) {
+    if (filters?.inStock) {
       filteredProducts = filteredProducts.filter(p => p.stock_status === 'instock');
     }
 
     // Ordenamiento
-    if (filters.sortBy) {
+    if (filters?.sortBy) {
       filteredProducts.sort((a, b) => {
         switch (filters.sortBy) {
           case 'price_asc':
@@ -197,8 +192,8 @@ class ProductService {
     }
 
     // Paginación
-    const page = filters.page || 1;
-    const perPage = filters.perPage || 10;
+    const page = filters?.page || 1;
+    const perPage = filters?.perPage || 10;
     const total = filteredProducts.length;
     const totalPages = Math.ceil(total / perPage);
     const start = (page - 1) * perPage;
@@ -217,41 +212,45 @@ class ProductService {
 
     return {
       products: productsWithPrices,
-      total,
       page,
       totalPages
     };
-  }
+  },
 
-  async getProduct(id: number): Promise<ProductWithCustomerPrice | null> {
-    await simulateNetworkDelay();
-    const product = MOCK_PRODUCTS.find(p => p.id === id) || null;
-    
-    if (!product) return null;
-    
+  async getProduct(id: number): Promise<ProductWithCustomerPrice> {
+    // Simular delay de red
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Buscar el producto en los datos simulados
+    const product = MOCK_PRODUCTS.find(p => p.id === id);
+    if (!product) {
+      throw new Error('Producto no encontrado');
+    }
+
+    // Obtener el tipo de cliente y calcular el precio con descuento
     const customerType = await this.getCustomerType();
+    const customerPrice = product.price * (1 - (customerType?.discount_percentage || 0) / 100);
+
     return {
       ...product,
-      customer_price: customerType
-        ? product.price * (1 - customerType.discount_percentage / 100)
-        : product.price
+      customer_price: customerPrice
     };
-  }
+  },
 
   async getCustomerType(): Promise<CustomerType | null> {
     const user = authService.getCurrentUser();
     return user ? CUSTOMER_TYPES[0] : null;
-  }
+  },
 
   async getBrands(): Promise<string[]> {
     await simulateNetworkDelay();
     return [...new Set(MOCK_PRODUCTS.map(p => p.brand))];
-  }
+  },
 
   async getWeights(): Promise<string[]> {
     await simulateNetworkDelay();
     return [...new Set(MOCK_PRODUCTS.map(p => p.weight))];
-  }
+  },
 
   async getPriceRange(): Promise<{ min: number; max: number }> {
     await simulateNetworkDelay();
@@ -261,6 +260,4 @@ class ProductService {
       max: Math.max(...prices)
     };
   }
-}
-
-export const productService = new ProductService();
+};
