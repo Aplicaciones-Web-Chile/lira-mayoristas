@@ -1,9 +1,12 @@
 <template>
   <ion-button fill="clear" @click="goToCart">
-    <ion-icon :icon="cartOutline" slot="icon-only"></ion-icon>
+    <ion-icon :icon="cartOutline" slot="start"></ion-icon>
     <ion-badge color="danger" v-if="cartSummary.totalItems > 0">
       {{ cartSummary.totalItems }}
     </ion-badge>
+    <span v-if="cartSummary.total > 0" class="cart-total">
+      ${{ cartSummary.total.toLocaleString() }}
+    </span>
   </ion-button>
 </template>
 
@@ -71,22 +74,30 @@ export default defineComponent({
 <style scoped>
 ion-badge {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
   font-size: 12px;
-  padding: 2px 4px;
-  min-width: 16px;
-  height: 16px;
-  border-radius: 8px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
 }
 
 ion-button {
   position: relative;
-  --padding-start: 8px;
-  --padding-end: 8px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  height: 40px;
 }
 
 ion-icon {
   font-size: 24px;
+  margin-right: 4px;
+}
+
+.cart-total {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ion-color-medium);
 }
 </style>

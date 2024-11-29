@@ -5,174 +5,195 @@
         <ion-buttons slot="start">
           <ion-back-button default-href="/products"></ion-back-button>
         </ion-buttons>
-        <ion-title>Detalle del Producto</ion-title>
+        <ion-title>{{ product?.name || 'Detalle del Producto' }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :fullscreen="true">
-      <!-- Loading State -->
-      <div v-if="loading" class="loading-container">
-        <ion-spinner name="crescent"></ion-spinner>
-        <ion-text>Cargando producto...</ion-text>
+    <ion-content>
+      <div v-if="loading" class="ion-padding">
+        <ion-skeleton-text :animated="true" style="width: 100%; height: 200px;"></ion-skeleton-text>
+        <ion-skeleton-text :animated="true" style="width: 60%;"></ion-skeleton-text>
+        <ion-skeleton-text :animated="true" style="width: 80%;"></ion-skeleton-text>
       </div>
 
-      <!-- Error State -->
-      <div v-else-if="error" class="error-container">
-        <ion-icon :icon="alertCircleOutline" size="large" color="danger"></ion-icon>
-        <h2>Error al cargar el producto</h2>
-        <p>{{ error }}</p>
-        <ion-button @click="loadProduct">Reintentar</ion-button>
-      </div>
-
-      <!-- Product Detail -->
       <div v-else-if="product" class="product-detail">
-        <!-- Image Gallery -->
-        <ion-slides pager="true" class="product-slides">
-          <ion-slide v-for="image in product.images" :key="image.id">
-            <img :src="image.src" :alt="image.alt" />
-          </ion-slide>
-        </ion-slides>
+        <swiper
+          v-if="productImages.length > 0"
+          :modules="[SwiperNavigation, SwiperPagination]"
+          :navigation="true"
+          :pagination="{ clickable: true }"
+          class="product-images"
+        >
+          <swiper-slide v-for="(image, index) in productImages" :key="index">
+            <ion-img :src="image" :alt="product?.name" @ionError="handleImageError"></ion-img>
+          </swiper-slide>
+        </swiper>
+        <div v-else class="default-image">
+          <ion-img src="/placeholder-product.jpg" :alt="product?.name"></ion-img>
+        </div>
 
-        <!-- Product Info -->
-        <div class="product-info">
+        <div class="ion-padding">
           <ion-card>
             <ion-card-header>
-              <div class="product-header">
-                <div>
-                  <ion-card-subtitle>
-                    <ion-chip v-for="category in product.categories" :key="category.id">
-                      {{ category.name }}
-                    </ion-chip>
-                  </ion-card-subtitle>
-                  <ion-card-title>{{ product.name }}</ion-card-title>
-                </div>
-                <ion-chip :color="product.stock_status === 'instock' ? 'success' : 'warning'">
-                  {{ product.stock_status === 'instock' ? 'En stock' : 'Agotado' }}
-                </ion-chip>
-              </div>
+              <ion-card-title>{{ product.name }}</ion-card-title>
+              <ion-card-subtitle>{{ product.brand }}</ion-card-subtitle>
             </ion-card-header>
 
             <ion-card-content>
-              <!-- Pricing -->
-              <div class="pricing-section">
-                <div class="price-container">
-                  <div class="price" :class="{ 'has-discount': product.customer_price < product.price }">
-                    <ion-text color="medium" class="regular-price" v-if="product.customer_price < product.price">
-                      ${{ product.price.toLocaleString() }}
-                    </ion-text>
-                    <ion-text color="dark" class="final-price">
-                      ${{ product.customer_price.toLocaleString() }}
-                    </ion-text>
-                  </div>
-                  <ion-chip color="success" v-if="product.customer_price < product.price">
-                    {{ ((1 - product.customer_price / product.price) * 100).toFixed(0) }}% Descuento
+              <div class="price-section">
+                <div class="original-price" v-if="product.price !== product.customer_price">
+                  <ion-text color="medium">
+                    <s>${{ product.price.toLocaleString() }}</s>
+                  </ion-text>
+                </div>
+                <div class="final-price">
+                  <ion-text color="dark">
+                    <strong>${{ product.customer_price.toLocaleString() }}</strong>
+                  </ion-text>
+                </div>
+                <div class="discount" v-if="product.price !== product.customer_price">
+                  <ion-chip color="success">
+                    {{ Math.round((1 - product.customer_price / product.price) * 100) }}% OFF
                   </ion-chip>
                 </div>
               </div>
 
-              <!-- Product Details -->
-              <div class="details-section">
-                <h3>Detalles del Producto</h3>
+              <div class="description">
                 <p>{{ product.description }}</p>
-                
-                <ion-list>
-                  <ion-item>
-                    <ion-label>
-                      <h3>SKU</h3>
-                      <p>{{ product.sku }}</p>
-                    </ion-label>
-                  </ion-item>
-                  
-                  <ion-item>
-                    <ion-label>
-                      <h3>Marca</h3>
-                      <p>{{ product.brand }}</p>
-                    </ion-label>
-                  </ion-item>
-
-                  <ion-item>
-                    <ion-label>
-                      <h3>Peso</h3>
-                      <p>{{ product.weight }}</p>
-                    </ion-label>
-                  </ion-item>
-
-                  <ion-item>
-                    <ion-label>
-                      <h3>Dimensiones</h3>
-                      <p>{{ product.dimensions.length }} × {{ product.dimensions.width }} × {{ product.dimensions.height }}</p>
-                    </ion-label>
-                  </ion-item>
-
-                  <ion-item>
-                    <ion-label>
-                      <h3>Stock</h3>
-                      <p>{{ product.stock_quantity }} unidades</p>
-                    </ion-label>
-                  </ion-item>
-                </ion-list>
               </div>
 
-              <!-- Add to Cart Section -->
-              <div class="cart-section">
+              <div class="stock-info">
+                <ion-text :color="product.stock_status === 'instock' ? 'success' : 'danger'">
+                  <ion-icon :icon="alertCircleOutline"></ion-icon>
+                  {{ product.stock_status === 'instock' ? `En stock (${product.stock_quantity} unidades)` : 'Sin stock' }}
+                </ion-text>
+              </div>
+
+              <div class="quantity-selector">
                 <ion-item>
-                  <ion-label>Cantidad</ion-label>
-                  <ion-input
-                    type="number"
-                    v-model="quantity"
-                    min="1"
-                    :max="product.stock_quantity"
-                    class="quantity-input"
-                  ></ion-input>
+                  <ion-label>Cantidad:</ion-label>
+                  <ion-select 
+                    v-model="quantity" 
+                    interface="popover" 
+                    :disabled="product.stock_status !== 'instock'"
+                  >
+                    <ion-select-option 
+                      v-for="qty in availableQuantities" 
+                      :key="qty" 
+                      :value="qty"
+                    >
+                      {{ qty }}
+                    </ion-select-option>
+                  </ion-select>
                 </ion-item>
-                
-                <ion-button 
-                  expand="block"
-                  :disabled="!product.stock_quantity || product.stock_status === 'outofstock'"
-                  @click="addToCart"
-                >
-                  <ion-icon :icon="cartOutline" slot="start"></ion-icon>
-                  Agregar al Carrito
-                </ion-button>
               </div>
+
+              <ion-button 
+                expand="block"
+                @click="addToCart"
+                :disabled="product.stock_status !== 'instock' || quantity < 1"
+                class="add-to-cart-button"
+              >
+                <ion-icon :icon="cartOutline" slot="start"></ion-icon>
+                Agregar al Carrito
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Detalles del Producto</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-list>
+                <ion-item>
+                  <ion-label>
+                    <h3>Marca</h3>
+                    <p>{{ product.brand }}</p>
+                  </ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-label>
+                    <h3>SKU</h3>
+                    <p>{{ product.sku }}</p>
+                  </ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-label>
+                    <h3>Categorías</h3>
+                    <p>{{ product.categories.map(cat => cat.name).join(', ') }}</p>
+                  </ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-label>
+                    <h3>Peso</h3>
+                    <p>{{ product.weight }}</p>
+                  </ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-label>
+                    <h3>Dimensiones</h3>
+                    <p>{{ product.dimensions.length }}x{{ product.dimensions.width }}x{{ product.dimensions.height }} cm</p>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
             </ion-card-content>
           </ion-card>
         </div>
+      </div>
+
+      <div v-else-if="error" class="ion-padding">
+        <ion-text color="danger">
+          <p>{{ error }}</p>
+        </ion-text>
+      </div>
+
+      <div v-else class="ion-padding">
+        <ion-text color="danger">
+          <p>Producto no encontrado</p>
+        </ion-text>
       </div>
     </ion-content>
   </ion-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import {
+import { defineComponent, ref, computed, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { 
+  IonPage,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
   IonBackButton,
-  IonButton,
   IonButtons,
   IonCard,
-  IonCardContent,
   IonCardHeader,
-  IonCardSubtitle,
   IonCardTitle,
-  IonChip,
-  IonContent,
-  IonHeader,
+  IonCardSubtitle,
+  IonCardContent,
+  IonButton,
   IonIcon,
-  IonInput,
+  IonText,
+  IonChip,
   IonItem,
   IonLabel,
+  IonSelect,
+  IonSelectOption,
   IonList,
-  IonPage,
-  IonSlide,
-  IonSlides,
-  IonSpinner,
-  IonText,
-  IonTitle,
-  IonToolbar,
+  IonImg,
+  IonSkeletonText,
+  toastController
 } from '@ionic/vue';
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Navigation as SwiperNavigation, Pagination as SwiperPagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import { alertCircleOutline, cartOutline } from 'ionicons/icons';
 import { productService } from '@/services/product.service';
+import { cartService } from '@/services/cart.service';
 import type { ProductWithCustomerPrice } from '@/types/product.types';
 
 export default defineComponent({
@@ -183,30 +204,49 @@ export default defineComponent({
     IonToolbar,
     IonTitle,
     IonContent,
-    IonButtons,
     IonBackButton,
-    IonSlides,
-    IonSlide,
+    IonButtons,
     IonCard,
-    IonCardContent,
     IonCardHeader,
-    IonCardSubtitle,
     IonCardTitle,
-    IonChip,
+    IonCardSubtitle,
+    IonCardContent,
+    IonButton,
     IonIcon,
-    IonInput,
+    IonText,
+    IonChip,
     IonItem,
     IonLabel,
+    IonSelect,
+    IonSelectOption,
     IonList,
-    IonSpinner,
-    IonText,
+    IonImg,
+    IonSkeletonText,
+    Swiper,
+    SwiperSlide,
   },
   setup() {
     const route = useRoute();
+    const router = useRouter();
     const product = ref<ProductWithCustomerPrice | null>(null);
     const loading = ref(true);
-    const error = ref<string | null>(null);
     const quantity = ref(1);
+    const error = ref<string | null>(null);
+
+    const productImages = computed(() => {
+      if (!product.value?.images) return [];
+      return Array.isArray(product.value.images) ? product.value.images : [];
+    });
+
+    const availableQuantities = computed(() => {
+      if (!product.value?.stock_quantity || product.value.stock_status !== 'instock') return [];
+      return Array.from({ length: Math.min(product.value.stock_quantity, 10) }, (_, i) => i + 1);
+    });
+
+    const handleImageError = (event: Event) => {
+      const img = event.target as HTMLImageElement;
+      img.src = '/placeholder-product.jpg';
+    };
 
     const loadProduct = async () => {
       try {
@@ -214,19 +254,39 @@ export default defineComponent({
         error.value = null;
         const productId = parseInt(route.params.id as string);
         product.value = await productService.getProduct(productId);
+        if (!product.value) {
+          error.value = 'Producto no encontrado';
+          router.push('/products');
+        }
       } catch (err) {
-        error.value = err instanceof Error ? err.message : 'Error desconocido';
+        error.value = 'Error al cargar el producto';
+        console.error('Error loading product:', err);
       } finally {
         loading.value = false;
       }
     };
 
-    const addToCart = () => {
-      // TODO: Implementar la funcionalidad del carrito
-      console.log('Agregando al carrito:', {
-        product: product.value,
-        quantity: quantity.value
-      });
+    const addToCart = async () => {
+      if (!product.value || quantity.value < 1) return;
+      
+      try {
+        await cartService.addToCart(product.value, quantity.value);
+        const toast = await toastController.create({
+          message: `${quantity.value} ${quantity.value === 1 ? 'unidad' : 'unidades'} agregadas al carrito`,
+          duration: 2000,
+          position: 'bottom',
+          color: 'success'
+        });
+        await toast.present();
+      } catch (err) {
+        const toast = await toastController.create({
+          message: 'Error al agregar al carrito',
+          duration: 2000,
+          position: 'bottom',
+          color: 'danger'
+        });
+        await toast.present();
+      }
     };
 
     onMounted(() => {
@@ -236,106 +296,83 @@ export default defineComponent({
     return {
       product,
       loading,
-      error,
       quantity,
-      loadProduct,
+      error,
+      productImages,
+      availableQuantities,
+      handleImageError,
       addToCart,
       alertCircleOutline,
       cartOutline,
+      SwiperNavigation,
+      SwiperPagination,
     };
   },
 });
 </script>
 
 <style scoped>
-.loading-container,
-.error-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  gap: 1rem;
-  text-align: center;
-  padding: 2rem;
+.product-detail {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.product-slides {
+.product-images {
+  width: 100%;
   height: 300px;
 }
 
-.product-slides img {
+.product-images ion-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
-.product-info {
-  padding: 1rem;
+.price-section {
+  margin: 16px 0;
 }
 
-.product-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.pricing-section {
-  margin: 1rem 0;
-  padding: 1rem;
-  background: var(--ion-color-light);
-  border-radius: 8px;
-}
-
-.price-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.price {
-  display: flex;
-  flex-direction: column;
-}
-
-.regular-price {
-  text-decoration: line-through;
+.original-price {
   font-size: 0.9em;
 }
 
 .final-price {
-  font-size: 1.4em;
-  font-weight: bold;
+  font-size: 1.5em;
+  margin: 8px 0;
 }
 
-.details-section {
-  margin: 1rem 0;
-}
-
-.details-section h3 {
-  margin: 1rem 0;
-  color: var(--ion-color-medium);
-}
-
-.cart-section {
-  margin-top: 2rem;
-}
-
-.quantity-input {
-  text-align: center;
-  max-width: 100px;
-}
-
-ion-item {
-  --padding-start: 0;
-}
-
-ion-list {
-  background: transparent;
-}
-
-ion-card {
+.discount ion-chip {
   margin: 0;
-  box-shadow: none;
+}
+
+.description {
+  margin: 16px 0;
+  line-height: 1.5;
+}
+
+.stock-info {
+  margin: 16px 0;
+}
+
+.stock-info ion-icon {
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.quantity-selector {
+  margin: 16px 0;
+}
+
+.add-to-cart-button {
+  margin-top: 16px;
+}
+
+:deep(.swiper-button-next),
+:deep(.swiper-button-prev) {
+  color: var(--ion-color-primary);
+}
+
+:deep(.swiper-pagination-bullet-active) {
+  background: var(--ion-color-primary);
 }
 </style>

@@ -235,6 +235,7 @@ import {
   IonTitle,
   IonToggle,
   IonToolbar,
+  toastController
 } from '@ionic/vue';
 import { filterOutline, eyeOutline, cartOutline } from 'ionicons/icons';
 import { productService } from '@/services/product.service';
@@ -287,7 +288,6 @@ export default defineComponent({
     const totalPages = ref(1);
     const brands = ref<string[]>([]);
     const priceRange = ref({ min: 0, max: 100000 });
-
     const filters = ref<ProductFilters>({
       search: '',
       category: 'all',
@@ -366,16 +366,24 @@ export default defineComponent({
       showFilters.value = !showFilters.value;
     };
 
-    const addToCart = (product: ProductWithCustomerPrice) => {
+    const addToCart = async (product: ProductWithCustomerPrice) => {
       cartService.addToCart(product);
-      // Mostrar confirmación
-      const toast = document.createElement('ion-toast');
-      toast.message = 'Producto agregado al carrito';
-      toast.duration = 2000;
-      toast.position = 'bottom';
-      toast.color = 'success';
-      document.body.appendChild(toast);
-      toast.present();
+      
+      const toast = await toastController.create({
+        message: `${product.name} agregado al carrito`,
+        duration: 2000,
+        position: 'bottom',
+        color: 'success',
+        buttons: [
+          {
+            text: 'Ver Carrito',
+            handler: () => {
+              router.push('/cart');
+            }
+          }
+        ]
+      });
+      await toast.present();
     };
 
     const goToProduct = (id: number) => {
