@@ -138,9 +138,11 @@
             v-for="product in products"
             :key="product.id"
           >
-            <ion-card @click="goToProduct(product.id)">
-              <img :src="product.images[0]?.src" :alt="product.images[0]?.alt" />
-              <ion-card-header>
+            <ion-card>
+              <div class="product-image" @click="goToProduct(product.id)">
+                <img :src="product.images[0]?.src" :alt="product.images[0]?.alt" />
+              </div>
+              <ion-card-header @click="goToProduct(product.id)">
                 <ion-card-subtitle>{{ product.categories[0]?.name }}</ion-card-subtitle>
                 <ion-card-title>{{ product.name }}</ion-card-title>
               </ion-card-header>
@@ -159,9 +161,24 @@
                     {{ product.stock_status === 'instock' ? 'En stock' : 'Agotado' }}
                   </ion-chip>
                 </div>
-                <ion-button expand="block" @click="addToCart(product)">
-                  Agregar al carrito
-                </ion-button>
+                <div class="card-actions">
+                  <ion-button 
+                    fill="outline" 
+                    expand="block"
+                    @click="goToProduct(product.id)"
+                  >
+                    <ion-icon :icon="eyeOutline" slot="start"></ion-icon>
+                    Ver Detalle
+                  </ion-button>
+                  <ion-button 
+                    expand="block"
+                    :disabled="product.stock_status !== 'instock'"
+                    @click.stop="addToCart(product)"
+                  >
+                    <ion-icon :icon="cartOutline" slot="start"></ion-icon>
+                    Agregar al Carrito
+                  </ion-button>
+                </div>
               </ion-card-content>
             </ion-card>
           </ion-col>
@@ -219,7 +236,7 @@ import {
   IonToggle,
   IonToolbar,
 } from '@ionic/vue';
-import { filterOutline } from 'ionicons/icons';
+import { filterOutline, eyeOutline, cartOutline } from 'ionicons/icons';
 import { productService } from '@/services/product.service';
 import type { ProductWithCustomerPrice, CustomerType } from '@/types/product.types';
 import type { ProductFilters } from '@/services/product.service';
@@ -373,6 +390,8 @@ export default defineComponent({
       priceRange,
       filters,
       filterOutline,
+      eyeOutline,
+      cartOutline,
       loadProducts,
       loadMore,
       handlePriceChange,
@@ -495,6 +514,21 @@ ion-infinite-scroll {
 
 .stock-toggle {
   width: 100%;
+}
+
+.product-image {
+  cursor: pointer;
+}
+
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+ion-card-header {
+  cursor: pointer;
 }
 
 ion-select {
