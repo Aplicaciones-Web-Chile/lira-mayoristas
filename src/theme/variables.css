@@ -1,2 +1,80 @@
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
+
+/* Lira Mayoristas Theme */
+:root {
+  /* Colores principales */
+  --ion-color-primary: #2c3e50;
+  --ion-color-primary-rgb: 44, 62, 80;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #273544;
+  --ion-color-primary-tint: #415162;
+
+  /* Colores secundarios */
+  --ion-color-secondary: #e74c3c;
+  --ion-color-secondary-rgb: 231, 76, 60;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #cb4335;
+  --ion-color-secondary-tint: #e95e50;
+
+  /* Colores de éxito */
+  --ion-color-success: #27ae60;
+  --ion-color-success-rgb: 39, 174, 96;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #229954;
+  --ion-color-success-tint: #3db670;
+
+  /* Colores de advertencia */
+  --ion-color-warning: #f1c40f;
+  --ion-color-warning-rgb: 241, 196, 15;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade: #d4ac0d;
+  --ion-color-warning-tint: #f2ca27;
+
+  /* Colores de error */
+  --ion-color-danger: #c0392b;
+  --ion-color-danger-rgb: 192, 57, 43;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #a93226;
+  --ion-color-danger-tint: #c64f40;
+
+  /* Colores de interfaz */
+  --ion-color-medium: #95a5a6;
+  --ion-color-medium-rgb: 149, 165, 166;
+  --ion-color-medium-contrast: #000000;
+  --ion-color-medium-contrast-rgb: 0, 0, 0;
+  --ion-color-medium-shade: #839192;
+  --ion-color-medium-tint: #a0aeaf;
+
+  --ion-color-light: #ecf0f1;
+  --ion-color-light-rgb: 236, 240, 241;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0, 0, 0;
+  --ion-color-light-shade: #d0d3d4;
+  --ion-color-light-tint: #eef2f3;
+
+  /* Fuentes */
+  --ion-font-family: 'Roboto', sans-serif;
+}
+
+/* Tema oscuro */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ion-color-primary: #3498db;
+    --ion-color-primary-rgb: 52, 152, 219;
+    --ion-color-primary-contrast: #ffffff;
+    --ion-color-primary-contrast-rgb: 255, 255, 255;
+    --ion-color-primary-shade: #2e86c1;
+    --ion-color-primary-tint: #48a2df;
+
+    --ion-background-color: #1a1a1a;
+    --ion-background-color-rgb: 26, 26, 26;
+    --ion-text-color: #ffffff;
+    --ion-text-color-rgb: 255, 255, 255;
+  }
+}

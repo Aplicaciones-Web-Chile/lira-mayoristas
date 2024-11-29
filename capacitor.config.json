@@ -1,0 +1,9 @@
+{
+  "appId": "cl.lira.mayoristas",
+  "appName": "Lira Mayoristas",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}
