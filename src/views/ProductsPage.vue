@@ -238,6 +238,7 @@ import {
 } from '@ionic/vue';
 import { filterOutline, eyeOutline, cartOutline } from 'ionicons/icons';
 import { productService } from '@/services/product.service';
+import { cartService } from '@/services/cart.service';
 import type { ProductWithCustomerPrice, CustomerType } from '@/types/product.types';
 import type { ProductFilters } from '@/services/product.service';
 
@@ -366,8 +367,7 @@ export default defineComponent({
     };
 
     const addToCart = (product: ProductWithCustomerPrice) => {
-      // TODO: Implementar la funcionalidad del carrito
-      console.log('Agregando al carrito:', product);
+      cartService.addToCart(product);
     };
 
     const goToProduct = (id: number) => {

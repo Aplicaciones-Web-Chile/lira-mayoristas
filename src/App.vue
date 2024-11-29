@@ -6,13 +6,39 @@
       </ion-content>
     </ion-menu>
     
-    <ion-router-outlet id="main-content"></ion-router-outlet>
+    <div class="ion-page" id="main-content">
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+          </ion-buttons>
+          <ion-title>{{ pageTitle }}</ion-title>
+          <ion-buttons slot="end">
+            <cart-button></cart-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-router-outlet></ion-router-outlet>
+    </div>
   </ion-app>
 </template>
 
 <script setup lang="ts">
-import { IonApp, IonContent, IonMenu, IonRouterOutlet } from '@ionic/vue';
+import { IonApp, IonContent, IonMenu, IonRouterOutlet, IonHeader, IonToolbar, IonTitle, IonButtons } from '@ionic/vue';
 import AppMenu from '@/components/AppMenu.vue';
+import CartButton from '@/components/CartButton.vue';
+
+components: {
+  IonApp,
+  IonRouterOutlet,
+  IonMenu,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonButtons,
+  CartButton
+},
 </script>
 
 <style>
