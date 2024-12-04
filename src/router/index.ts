@@ -55,6 +55,18 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/checkout',
+    name: 'Checkout',
+    component: () => import('@/views/CheckoutPage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/checkout/confirm',
+    name: 'CheckoutConfirm',
+    component: () => import('@/views/CheckoutConfirmPage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('@/views/NotFoundPage.vue')
