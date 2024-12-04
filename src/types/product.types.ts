@@ -32,6 +32,7 @@ export interface Product {
   images: ProductImage[];
   weight: string;
   dimensions: ProductDimensions;
+  meta_data?: { key: string; value: any }[];
 }
 
 export interface CustomerType {
@@ -42,4 +43,5 @@ export interface CustomerType {
 
 export interface ProductWithCustomerPrice extends Product {
   customer_price: number;
+  meta_data?: { key: string; value: any }[];
 }

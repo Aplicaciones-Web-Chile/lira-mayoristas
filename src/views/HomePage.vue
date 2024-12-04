@@ -205,9 +205,12 @@ const loadData = async () => {
   try {
     user.value = await authService.getCurrentUser();
     customerType.value = await productService.getCustomerType();
-    featuredProducts.value = (await productService.getProducts())
+    const productsResponse = await productService.getProducts();
+    const { products } = productsResponse;
+    const filteredProducts = products
       .filter(p => p.meta_data?.some(m => m.key === 'featured' && m.value === true))
       .slice(0, 6); // Limitamos a 6 productos destacados
+    featuredProducts.value = filteredProducts;
   } catch (error) {
     console.error('Error loading data:', error);
   }

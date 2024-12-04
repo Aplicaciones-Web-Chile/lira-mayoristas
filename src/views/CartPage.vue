@@ -186,8 +186,7 @@ export default defineComponent({
 
     // Proceder al pago
     const checkout = () => {
-      // TODO: Implementar checkout
-      console.log('Procediendo al pago...');
+      router.push('/checkout');
     };
 
     onMounted(() => {
